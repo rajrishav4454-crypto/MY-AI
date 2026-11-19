@@ -114,10 +114,10 @@
                 const transcript = event.results[0][0].transcript.trim();
                 statusDiv.innerText = "You said: " + transcript;
 
-                const lowerTranscript = transcript.toLowerCase();
-                if (lowerTranscript.includes("hey rani") || lowerTranscript.includes("hello rani")) 
-                    speak("Hello Rishab. I am ready to help.");
-                 else {
+               
+                
+                    fetch('http://localhost:5000', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+                  {
                   fetch('http://localhost:5000', {
 method: 'POST',
 headers: {

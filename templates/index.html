@@ -118,7 +118,7 @@
                 
                    fetch('https://my-ai-1-bbss.onrender.com', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ transcript: transcript }) })
                   {
-                  fetch('https://my-ai-1-bbss.onrender.com', {
+                  fetch('https://my-ai-1-bbss.onrender.com'), {
 method: 'POST',
 headers: {
 'Content-Type': 'application/json'
@@ -134,6 +134,9 @@ body: JSON.stringify({ transcript: transcript })
 
             recognition.onerror = (event) => {
                 statusDiv.innerText = "Error occurred: " + event.error;
+                recognition.onend = () => {
+    recognition.start();
+};
             };
 
             recognition.onend = () => {

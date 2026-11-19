@@ -21,7 +21,8 @@
 
         .ai-core {
             position: relative;
-            width: 80vmin;max-width:400px;
+            width: 80vmin;
+            max-width: 400px;
             height: 300px;
             display: flex;
             justify-content: center;
@@ -75,7 +76,6 @@
             0%, 100% { transform: scale(0.8); opacity: 0.8; }
             50% { transform: scale(1.2); opacity: 1; }
         }
-       @media (min-width: 768px)
     </style>
 </head>
 <body>
@@ -91,15 +91,14 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         let selectedVoice = null;
+        let isAssistantActive = false;
 
         function updateVoiceList() {
             const voices = window.speechSynthesis.getVoices();
-            // Try to find a suitable female voice
             selectedVoice = voices.find(voice => 
+                voice.lang.includes("hi") || 
                 voice.name.includes("Female") || 
-                voice.name.includes("Natural") || 
-                voice.name.includes("Google") ||
-                voice.lang.includes("hi")
+                voice.name.includes("Google")
             ) || voices[0];
         }
 
@@ -110,39 +109,44 @@
             recognition = new SpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = false;
+            recognition.lang = 'hi-IN'; // हिंदी और इंग्लिश दोनों समझने के लिए
 
             recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.trim();
+                // हमेशा सबसे आखिरी बोली गई लाइन लें
+                const lastResultIndex = event.results.length - 1;
+                const transcript = event.results[lastResultIndex][0].transcript.trim();
                 statusDiv.innerText = "You said: " + transcript;
 
-               
-                
-                   fetch('https://my-ai-1-bbss.onrender.com', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ transcript: transcript }) })
-                  {
-                  fetch('https://my-ai-1-bbss.onrender.com'), {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-},
-body: JSON.stringify({ transcript: transcript })
-}
-.then(response => response.json())
-.then(data => speak(data.reply))
-.catch(error => console.error('Error:', error));
-                }
+                // सर्वर पर डेटा भेजें
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ transcript: transcript })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.reply) {
+                        speak(data.reply);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    statusDiv.innerText = "Server error!";
+                });
             };
-            
 
             recognition.onerror = (event) => {
-                statusDiv.innerText = "Error occurred: " + event.error;
-                recognition.onend = () => {
-    recognition.start();
-};
+                console.log("Speech error:", event.error);
             };
 
+            // जैसे ही सुनना बंद हो, अपने आप दोबारा शुरू करें
             recognition.onend = () => {
-                if (statusDiv.innerText.startsWith("You said:")) {
-                    // Keep showing the transcript briefly
+                if (isAssistantActive) {
+                    try {
+                        recognition.start();
+                    } catch (e) {}
                 }
             };
         } else {
@@ -150,28 +154,24 @@ body: JSON.stringify({ transcript: transcript })
         }
 
         function speak(text) {
-            window.speechSynthesis.cancel(); // Stop any ongoing speech
+            window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
             }
-            utterance.rate = 1.0; // Normal speed
+            utterance.rate = 1.0;
             window.speechSynthesis.speak(utterance);
-            recognition.onend = () => recognition.start();
         }
 
-        function generateAnswer(question) {
-            const responseText = "You asked about " + question + ". I am processing this.";
-            speak(responseText);
-        }
-
+        // पहली बार स्क्रीन पर कहीं भी क्लिक करने से असिस्टेंट चालू हो जाएगा
         window.onclick = () => {
-            if (recognition) {
+            if (recognition && !isAssistantActive) {
+                isAssistantActive = true;
                 try {
                     recognition.start();
                     statusDiv.innerText = "Listening...";
                 } catch (e) {
-                    console.log("Recognition already running");
+                    console.log("Already running");
                 }
             }
         };

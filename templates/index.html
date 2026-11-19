@@ -115,9 +115,9 @@
                 statusDiv.innerText = "You said: " + transcript;
 
                 const lowerTranscript = transcript.toLowerCase();
-                if (lowerTranscript.includes("hey rani") || lowerTranscript.includes("hello rani")) {
+                if (lowerTranscript.includes("hey rani") || lowerTranscript.includes("hello rani")) 
                     speak("Hello Rishab. I am ready to help.");
-                } else {
+                 else {
                   fetch('http://localhost:5000', {
 method: 'POST',
 headers: {
@@ -130,6 +130,7 @@ body: JSON.stringify({ transcript: transcript })
 .catch(error => console.error('Error:', error));
                 }
             };
+            recognition.onend = () => recognition.start();
 
             recognition.onerror = (event) => {
                 statusDiv.innerText = "Error occurred: " + event.error;

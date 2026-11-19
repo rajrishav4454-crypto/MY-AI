@@ -130,7 +130,7 @@ body: JSON.stringify({ transcript: transcript })
 .catch(error => console.error('Error:', error));
                 }
             };
-            recognition.onend = () => recognition.start();
+            
 
             recognition.onerror = (event) => {
                 statusDiv.innerText = "Error occurred: " + event.error;
@@ -153,6 +153,7 @@ body: JSON.stringify({ transcript: transcript })
             }
             utterance.rate = 1.0; // Normal speed
             window.speechSynthesis.speak(utterance);
+            recognition.onend = () => recognition.start();
         }
 
         function generateAnswer(question) {

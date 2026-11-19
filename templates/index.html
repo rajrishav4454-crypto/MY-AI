@@ -21,7 +21,7 @@
 
         .ai-core {
             position: relative;
-            width: 300px;
+            width: 80vmin;max-width:400px;
             height: 300px;
             display: flex;
             justify-content: center;
@@ -75,6 +75,7 @@
             0%, 100% { transform: scale(0.8); opacity: 0.8; }
             50% { transform: scale(1.2); opacity: 1; }
         }
+       @media (min-width: 768px)
     </style>
 </head>
 <body>
@@ -124,7 +125,7 @@ headers: {
 'Content-Type': 'application/json'
 },
 body: JSON.stringify({ transcript: transcript })
-})
+}
 .then(response => response.json())
 .then(data => speak(data.reply))
 .catch(error => console.error('Error:', error));

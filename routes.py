@@ -1,5 +1,5 @@
 from flask import render_template
-from MY AI import app
+from __init__ import app
 
 @app.route("/")
 def home():

@@ -2,7 +2,7 @@ from flask import render_template, request, jsonify
 from __init__ import app
 from google import genai
 
-AQ.Ab8RN6I5RCWtJ3HqcIcpTqq8Rl3-05jqmeTGl9TQuppFEgBSRg
+'AQ.Ab8RN6I5RCWtJ3HqcIcpTqq8Rl3-05jqmeTGl9TQuppFEgBSRg'
 client = genai.Client(api_key="YOUR_GEMINI_API_KEY")
 
 @app.route("/")
